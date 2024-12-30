@@ -16,8 +16,11 @@
 <div>
 <form id="orderForm">
     <h1>Merri Wish</h1>
-    <input style="font-size: 16px" id="Пожелание" type="text" placeholder=" Ваше пожелание" required><br>
+    <input style="font-size: 16px;" id="Пожелание" type="text" placeholder=" Ваше пожелание" required><br>
     <p>&copyВ конце пожелания оставляйте ваш Telegram Username для получения награды в дальнейшем</p>
+<div class="container"> 
+    <button type="submit" id="send"><b>Отправить</b></button>
+</div>
 </form>
 </div>
 </center>
@@ -56,6 +59,29 @@ img {
 div {
     margin-top: 160px;
 }
+.container {
+  background-color: rgb(55, 55, 55);
+  width: 110%;
+  height: 90px;
+  bottom: 0;
+  position: absolute;
+  margin-left: -25px;
+  border: 1px solid rgb(77, 77, 77);
+}
+button {
+  background-color: rgb(0, 136, 255);
+  border: none;
+  width: 85%;
+  height: 50px;
+  border-radius: 15px;
+  margin-left: -15px;
+  margin-top: 10px;
+  font-family: Geologica;
+  color: white;
+}
+button:active {
+  transform: translateY(5px);
+}
 </style>
 
 <script type="module">
@@ -76,6 +102,7 @@ import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/fireb
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
       const orderForm = document.getElementById("orderForm");
+
 
   orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -100,17 +127,6 @@ import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/fireb
           return v.toString(16);
         });
       }
-
-  window.Telegram.WebApp.ready();
-  window.Telegram.WebApp.MainButton.show();
-  window.Telegram.WebApp.MainButton.text = "Отправить";
-
-  window.Telegram.WebApp.MainButton.onClick = async () => {
-    // Вызываем отправку формы
-    orderForm.dispatchEvent(new Event('submit'));
-  };
 </script>
-</body>
-</html>
 </body>
 </html>
