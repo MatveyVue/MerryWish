@@ -60,59 +60,57 @@ div {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyB99Izcf6vJFkNVeTLZfukt5UCQPBFSzZ4",
-    authDomain: "merry-wish.firebaseapp.com",
-    databaseURL: "https://merry-wish-default-rtdb.firebaseio.com",
-    projectId: "merry-wish",
-    storageBucket: "merry-wish.firebasestorage.app",
-    messagingSenderId: "472160350126",
-    appId: "1:472160350126:web:13ccce689eccd0106be23f",
-    measurementId: "G-2FV9T3RFY0"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyB99Izcf6vJFkNVeTLZfukt5UCQPBFSzZ4",
+        authDomain: "merry-wish.firebaseapp.com",
+        databaseURL: "https://merry-wish-default-rtdb.firebaseio.com",
+        projectId: "merry-wish",
+        storageBucket: "merry-wish.firebasestorage.app",
+        messagingSenderId: "472160350126",
+        appId: "1:472160350126:web:13ccce689eccd0106be23f",
+        measurementId: "G-2FV9T3RFY0"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const orderForm = document.getElementById("orderForm");
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      const orderForm = document.getElementById("orderForm");
 
-// Обработчик события отправки формы
-orderForm.addEventListener('submit', async (e) => {
+  orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const Пожелание = document.getElementById("Пожелание").value;
 
     if (Пожелание === "") {
-        alert("Пожалуйста, заполните поле!");
-        return;
+      alert("Пожалуйста, заполните поле!");
+      return;
     }
 
     try {
-        await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание });
-        alert("Пожелание отправлено!");
-        orderForm.reset();
+      await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание });
+      alert("Пожелание отправлено!");
+      orderForm.reset();
     } catch (error) {
-        alert("Ошибка при отправке пожелания");
+      alert("Ошибка при отправке пожелания");
     }
-});
+  });
+  function generateUUID() {
+        return 'xx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
 
-// Генерация UUID
-function generateUUID() {
-    return 'xx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
+  window.Telegram.WebApp.ready();
+  window.Telegram.WebApp.MainButton.show();
+  window.Telegram.WebApp.MainButton.text = "Отправить";
 
-// Настройка кнопки Telegram
-window.Telegram.WebApp.ready();
-window.Telegram.WebApp.MainButton.show();
-window.Telegram.WebApp.MainButton.text = "Отправить";
-
-window.Telegram.WebApp.MainButton.onClick = async () => {
+  window.Telegram.WebApp.MainButton.onClick = async () => {
     // Вызываем отправку формы
     orderForm.dispatchEvent(new Event('submit'));
-};
+  };
 </script>
+</body>
+</html>
 </body>
 </html>
