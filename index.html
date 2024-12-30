@@ -15,12 +15,11 @@
 <center>
 <div>
 <form id="orderForm">
-    <h1>Merri Wish</h1>
+    <h1>Merry Wish</h1>
+    <input style="font-size: 16px;" id="Username" type="text" placeholder=" Ваш username" required><br>
     <input style="font-size: 16px;" id="Пожелание" type="text" placeholder=" Ваше пожелание" required><br>
     <p>&copyВ конце пожелания оставляйте ваш Telegram Username для получения награды в дальнейшем</p>
-<div class="container"> 
     <button type="submit" id="send"><b>Отправить</b></button>
-</div>
 </form>
 </div>
 </center>
@@ -30,9 +29,7 @@ body {
     background-image: url('https://media0.giphy.com/media/iqn1W7iaSzQZ9DuTPU/giphy.gif?cid=9b38fe916dnmwb69gl8ywlp93aat9pl0j936gucyhjrjlo7z&ep=v1_gifs_username&rid=giphy.gif&ct=g');
     color: white;
     touch-action: none;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    user-scalable: no
+    overflow: none;
 }
 input {
     background-color: rgb(255, 255, 255);
@@ -61,23 +58,12 @@ img {
 div {
     margin-top: 160px;
 }
-.container {
-  background-color: rgb(55, 55, 55);
-  width: 110%;
-  height: 90px;
-  bottom: 0;
-  position: absolute;
-  margin-left: -25px;
-  border: 1px solid rgb(77, 77, 77);
-}
 button {
   background-color: rgb(0, 136, 255);
   border: none;
-  width: 85%;
+  width: 95%;
   height: 50px;
   border-radius: 15px;
-  margin-left: -15px;
-  margin-top: 10px;
   font-family: Geologica;
   color: white;
 }
@@ -86,43 +72,46 @@ button:active {
 }
 </style>
 
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyB99Izcf6vJFkNVeTLZfukt5UCQPBFSzZ4",
-        authDomain: "merry-wish.firebaseapp.com",
-        databaseURL: "https://merry-wish-default-rtdb.firebaseio.com",
-        projectId: "merry-wish",
-        storageBucket: "merry-wish.firebasestorage.app",
-        messagingSenderId: "472160350126",
-        appId: "1:472160350126:web:13ccce689eccd0106be23f",
-        measurementId: "G-2FV9T3RFY0"
-    };
-
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
-      const orderForm = document.getElementById("orderForm");
-
-
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  
+  const firebaseConfig = {
+      apiKey: "API_KEY_HERE",
+      authDomain: "merry-wish.firebaseapp.com",
+      databaseURL: "https://merry-wish-default-rtdb.firebaseio.com",
+      projectId: "merry-wish",
+      storageBucket: "merry-wish.firebasestorage.app",
+      messagingSenderId: "472160350126",
+      appId: "1:472160350126:web:13ccce689eccd0106be23f",
+      measurementId: "G-2FV9T3RFY0"
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const orderForm = document.getElementById("orderForm");
+  
   orderForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const Пожелание = document.getElementById("Пожелание").value;
-
-    if (Пожелание === "") {
-      alert("Пожалуйста, заполните поле!");
-      return;
-    }
-
-    try {
-      await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание });
-      alert("Пожелание отправлено!");
-      orderForm.reset();
-    } catch (error) {
-      alert("Ошибка при отправке пожелания");
-    }
+      e.preventDefault();
+      const Пожелание = document.getElementById("Пожелание").value;
+      const Username = document.getElementById("Username").value;
+  
+      if (Пожелание === "" || Username === "") {
+          alert("Пожалуйста, заполните поле!");
+          return;
+      }
+  
+      try {
+          await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание, Username });
+          alert("Пожелание отправлено!");
+          orderForm.reset();
+      } catch (error) {
+          console.error("Ошибка при отправке пожелания:", error);
+          alert("Ошибка при отправке пожелания");
+      }
   });
+  
   function generateUUID() {
         return 'xx'.replace(/[xy]/g, function(c) {
           const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
