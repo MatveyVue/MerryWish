@@ -16,12 +16,21 @@
 <div>
 <form id="orderForm">
     <h1>Merry Wish</h1>
-    <input style="font-size: 16px;" id="Username" type="text" placeholder=" Ваш username" required><br>
+    <input style="font-size: 16px;" id="Username" type="text" placeholder=" Ваш username" readonly><br>
     <input style="font-size: 16px;" id="Пожелание" type="text" placeholder=" Ваше пожелание" required><br>
     <button type="submit" id="send"><b>Отправить</b></button>
 </form>
 </div>
 </center>
+
+<!-- Модальное окно -->
+<div id="usernameModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); color: white; justify-content: center; align-items: center; z-index: 1000;">
+  <div style="background: #333; padding: 20px; border-radius: 10px; text-align: center;">
+    <h2>У вас нет username</h2>
+    <p>Пожалуйста, установите username в настройках Telegram.</p>
+    <button id="checkUsernameButton">Проверить</button>
+  </div>
+</div>
 
 <style>
 body {
@@ -30,6 +39,7 @@ body {
     color: white;
     overflow-y: hidden;
     overflow-x: hidden;
+    font-family: Geologica;
 }
 input {
     background-color: rgb(255, 255, 255);
@@ -67,13 +77,25 @@ button {
 button:active {
   transform: translateY(5px);
 }
+#usernameModal button {
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#usernameModal button:hover {
+  background-color: #0056b3;
+}
 </style>
 
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
   import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-  
+
   const firebaseConfig = {
       apiKey: "API_KEY_HERE",
       authDomain: "merry-wish.firebaseapp.com",
@@ -84,37 +106,80 @@ button:active {
       appId: "1:472160350126:web:13ccce689eccd0106be23f",
       measurementId: "G-2FV9T3RFY0"
   };
-  
+
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   const orderForm = document.getElementById("orderForm");
+  const usernameInput = document.getElementById("Username");
+  const usernameModal = document.getElementById("usernameModal");
+  const checkUsernameButton = document.getElementById("checkUsernameButton");
+
+  // Функция для проверки наличия username
+  function checkUsername() {
+    if (window.Telegram.WebApp.initData) {
+      const initData = new URLSearchParams(window.Telegram.WebApp.initData);
+      const user = JSON.parse(initData.get('user'));
+      if (user && user.username) {
+        usernameInput.value = user.username; // Заполняем поле username
+        usernameModal.style.display = "none"; // Скрываем модальное окно
+        return true;
+      }
+    }
+    usernameModal.style.display = "flex"; // Показываем модальное окно
+    return false;
+  }
   
+
+  // Проверяем username при загрузке страницы
+  if (!checkUsername()) {
+    // Если username отсутствует, блокируем форму
+    orderForm.style.pointerEvents = "none";
+    orderForm.style.opacity = "0.5";
+  }
+
+  // Обработчик для кнопки "Проверить"
+  checkUsernameButton.addEventListener('click', () => {
+    if (checkUsername()) {
+      // Если username появился, разблокируем форму
+      orderForm.style.pointerEvents = "auto";
+      orderForm.style.opacity = "1";
+    }
+  });
+
   orderForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const Пожелание = document.getElementById("Пожелание").value;
-      const Username = document.getElementById("Username").value;
-  
-      if (Пожелание === "" || Username === "") {
-          alert("Пожалуйста, заполните поле!");
+      const Username = usernameInput.value;
+
+      if (Пожелание === "") {
+          showMessage("Пожалуйста, заполните поле пожелания!");
           return;
       }
-  
+
       try {
           await set(ref(db, 'Пожелания/' + generateUUID()), { Пожелание, Username });
-          alert("Пожелание отправлено!");
+          showMessage("Пожелание отправлено!");
           orderForm.reset();
       } catch (error) {
           console.error("Ошибка при отправке пожелания:", error);
-          alert("Ошибка при отправке пожелания");
+          showMessage("Ошибка при отправке пожелания");
       }
   });
-  
+
   function generateUUID() {
-        return 'xx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      }
+    return 'xx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  function showMessage(message) {
+    if (window.Telegram.WebApp) {
+      window.Telegram.WebApp.showAlert(message);
+    } else {
+      alert(message);
+    }
+  }
 </script>
 </body>
 </html>
